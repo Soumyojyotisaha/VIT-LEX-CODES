@@ -1,0 +1,1252 @@
+1.---if hi then bye
+%
+{
+#include<stdio.h>
+%
+}
+%%
+"hi" {printf("Bye");}
+.* {printf("Wrong);}
+%%
+main()
+{
+printf("Enter input");
+yylex();
+}
+int yywrap()
+{
+return 1;
+}
+------------------------------------------------------------------------------------------------------------------------------------------------
+2.--check odd or even
+%{
+#include<stdio.h>
+int m;
+%}
+%%
+[0-9]+ { m=atoi(yytext);
+         if (m%2==0)
+         printf("Even");
+         else
+         printf("Odd");
+       }
+.* {printf("Wrong");}
+%%
+int main()
+{
+printf("Enter ip");
+yylex();
+}
+int yywrap()
+{
+return 1'
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------
+3.--/* Write a LEX program to count the number of vowels and consonants in a given string. */
+
+%{
+#include <stdio.h>
+int vowel = 0, consonant = 0;
+%}
+
+%%
+
+[aeiouAEIOU] { printf("vowel\t"); vowel++; }
+[a-zA-Z]    { printf("consonant\t"); consonant++; }
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    printf("Enter the string comprising English alphabets:\n");
+    yylex();
+    printf("Number of vowels: %d\n", vowel);
+    printf("Number of consonants: %d\n", consonant);
+    return 0;
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------
+4./* Write a LEX program to count the number of lines, tabs, spaces and chars */
+
+%{
+    #include<stdio.h>
+    int n=1, m=0, t=0, c=0;
+%}
+
+%%
+
+\n n++;
+\t m++;
+[ ] { t++; printf("Matched tab: %s\n", yytext); }
+. { c++; printf("Matched char: %s\n", yytext); }
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{
+    yylex();
+    printf("Total no. of\nLines = %d\nTabs = %d\nSpaces = %d\nChars = %d\n", n, m, t, c);
+    return 0;
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+5./* Write a LEX program to convert an octal number to a decimal number. */
+
+%{
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+    int o = 0, d = 0, b = 0;
+%}
+
+%%
+
+^[0-7]+ {b = 1; o = atoi(yytext);}
+[\n] {;}
+. {b = 0;}
+
+%%
+
+int yywrap()
+{
+    if(b)
+    {
+        d = dec(o);
+        printf("Decimal is %d\n", d);
+    }
+    else
+    {
+        printf("Invalid Octal No.");
+    }
+}
+
+int dec(int oct)
+{
+    int d = 0, c = 0;
+    while (oct)
+    {
+        int a = oct % 10;
+        d += a * pow(8, c);
+        c++;
+        oct /= 10;
+    }
+    return d;
+}
+
+int main()
+{
+    printf("Enter the octal no.:\n ");
+    yylex();
+    return 0;
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+6./*Given an input sentence, write a Lex Program to count the number of words whose length is greater than 2. */
+
+%{
+#include<stdio.h>
+#include<string.h>
+int l = 0, c = 0;
+%}
+
+%%
+
+[a-zA-Z]+ {
+    l = strlen(yytext);
+    if (l > 2) {
+        c++;
+    }
+}
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    printf("Enter the sentence:\n");
+    yylex();
+    printf("\nNumber of words whose length is greater than 2: %d\n", c);
+    return 0;
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+7./* Write a program to tokenize a C-program with reserve keywords use by the users. */
+
+%{
+#include <stdio.h>
+#include <string.h>
+int key = 0;
+int sep = 0;
+int op = 0;
+int iden = 0;
+%}
+
+%%
+
+auto|break|case|char|const|continue|default|do|double|else|enum|extern|float|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch|typedef|union|unsigned|void|volatile|while|main {
+    key++;
+}
+
+[{};,()] {
+    sep++;
+}
+
+[a-zA-Z_][a-zA-Z0-9_]* {
+    iden++;
+}
+
+[+-/=*%<><=>=!]=? {
+    op++;
+}
+
+. {
+    // Ignore any other characters
+}
+
+%%
+
+int yywrap(void) {
+    return 1;
+}
+
+int main() {
+    printf("Enter the input:\n");
+    yylex();
+    printf("\nKeywords: %d\n", key);
+    printf("Identifier: %d\n", iden);
+    printf("Operator: %d\n", op);
+    printf("Separator: %d\n", sep);
+    return 0;
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+8./* Write a Lex program to search a word in a file. */
+
+%{
+#include <stdio.h>
+#include <string.h>
+
+void check(char *);
+%}
+
+%%
+
+[a-zA-Z]+   check(yytext);
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    printf("Enter the word to search:\n");
+    char word[100];
+    scanf("%s", word);
+    yylex();
+    return 0;
+}
+
+void check(char *str) {
+    FILE *fp;
+    char temp[100];
+
+    fp = fopen("input.txt", "r"); /* r is read only */
+
+    if (fp == NULL) {
+        printf("Error opening the file.\n");
+        return;
+    }
+
+    while ((fscanf(fp, "%s", temp)) != EOF) {
+        if (!(strcmp(temp, str))) {
+            printf("Found\n");
+            fclose(fp);
+            return;
+        }
+    }
+
+    printf("Not found\n");
+    fclose(fp);
+}
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+9./* Write a Lex program to find the length of the longest word */
+
+%{
+    int c = 0;
+%}
+
+%%
+
+[a-zA-Z]+ {
+            if(yyleng > c)
+            {
+                c = yyleng;
+            }
+          }
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{
+    printf("Enter the sentence:\n");
+    yylex();
+    printf("Largest: %d\n", c);
+    return 0;
+}
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+10./* Write a lex program for Dfa start with ab contains aa and end with ba. */
+
+%{
+#include <stdio.h>
+%}
+
+%%
+
+^ab.*aa.*ba$  { printf("Valid\n"); }
+.*           { printf("Invalid\n"); }
+
+%%
+
+int main() {
+    printf("Enter the string:\n");
+    yylex();
+    return 0;
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+11.
+
+/* Write a Lex program to check perfect numbers. */
+%{
+#include <stdio.h>
+%}
+
+digit   [0-9]
+number  {digit}+
+perfect "6|28|496|8128"   /* Predefined perfect numbers */
+
+%%
+
+^{number}$
+{
+    int num = atoi(yytext);
+    int sum = 0;
+
+    /* Calculate the sum of divisors */
+    for (int i = 1; i < num; i++) {
+        if (num % i == 0) {
+            sum += i;
+        }
+    }
+
+    /* Check if the number is perfect */
+    if (sum == num) {
+        printf("%d is a perfect number.\n", num);
+    } else {
+        printf("%d is not a perfect number.\n", num);
+    }
+}
+
+^{perfect}$
+{
+    printf("%s is a predefined perfect number.\n", yytext);
+}
+
+.|\n
+
+%%
+
+int main() {
+    printf("Enter a number to check if it's a perfect number:\n");
+    yylex();
+    return 0;
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+12./* DFA in LEX code which accepts strings ending with 11. */
+%{
+%}
+
+%s A B DEAD
+
+%%
+
+<INITIAL>1 BEGIN A;
+<INITIAL>0 BEGIN INITIAL;
+<INITIAL>[^01\n] BEGIN DEAD;
+<INITIAL>\n BEGIN INITIAL; { printf("Not accepted\n"); }
+
+<A>1 BEGIN B;
+<A>0 BEGIN INITIAL;
+<A>[^01\n] BEGIN DEAD;
+<A>\n BEGIN INITIAL; { printf("Not accepted\n"); }
+
+<B>1 BEGIN B;
+<B>0 BEGIN INITIAL;
+<B>[^01\n] BEGIN DEAD;
+<B>\n BEGIN INITIAL; { printf("Accepted\n"); }
+
+<DEAD>[^\n] BEGIN DEAD;
+<DEAD>\n BEGIN INITIAL; { printf("Invalid\n"); }
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{
+    printf("Enter the string:\n");
+    yylex();
+    return 0;
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+12./* DFA in LEX code which accepts even number of zeros and even number of ones. */
+%{
+%}
+
+%s A B
+
+%%
+
+<INITIAL>1 BEGIN INITIAL;
+<INITIAL>0 BEGIN A;
+<INITIAL>[^01\n] BEGIN B;
+<INITIAL>\n BEGIN INITIAL; printf("Accepted\n");
+
+<A>1 BEGIN A;
+<A>0 BEGIN INITIAL;
+<A>[^01\n] BEGIN B;
+<A>\n BEGIN INITIAL; printf("Not Accepted\n");
+
+<B>1 BEGIN B;
+<B>0 BEGIN B;
+<B>[^01\n] BEGIN B;
+<B>\n BEGIN INITIAL; printf("Invalid\n");
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{
+    printf("Enter the string:\n");
+    yylex();
+    return 0;
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+12./* Design a DFA in LEX Code which accepts string containing even number of ‘a’ and even number of ‘b’ over input alphabet {a,b}. */
+
+%{
+    #include<stdio.h>
+    int aCount=0;
+    int bCount=0;
+    int state=0;
+%}
+
+%%
+
+[a] { aCount++; state = (state+1)%2;}
+[b] { bCount++; state = (state+1)%2;}
+\n;
+.;
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{
+    yylex();
+    if(state==0&&aCount%2==0&&bCount%2==0)
+    {
+        printf("Accepted\n");
+    }
+    else
+    {
+        printf("Rejected\n");
+    }
+    return0;
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+13./* Design a DFA in LEX Code which accepts string containing third last element ‘a’ over input alphabet {a,b}. */
+
+%{
+    #include<stdio.h>
+    int state = 0;
+    int aCount = 0;
+    int bCount = 0;
+%}
+
+%%
+
+[a] { aCount++; bCount=0;}
+[b] { bCount++; aCount=0;}
+\n ;
+. ;
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{
+    yylex();
+    if(bCount==2||aCount>=3)
+    {
+        printf("Accepted\n");
+    }
+    else
+    {
+        printf("Rejected\n");
+    }
+    return 0;
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+14./* Design a LEX code to recognize valid arithmetic expression with operators '+', '-', '*' and '/'. */
+
+%{
+    #include<stdio.h>
+%}
+
+%%
+
+[0-9]+ { printf("Number: %s\n", yytext);}
+[-+*/] { printf("Operator: %s\n", yytext);}
+[\t]; /* Ignore white space */
+\n;
+. { printf("Invalid character: %s\n", yytext);}
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{
+    yylex();
+    return 0;
+}
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+15./* Design a LEX Code to identify and print valid identifier of C/C++ in given input pattern.*/
+
+%{
+    int c=0;
+%}
+
+%%
+
+[a-zA-Z_][a-zA-Z0-9_]* {c++; printf("\tvalid Identifier = %s", yytext);}
+. ;
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{
+    yylex();
+    printf("\nTotal number of valid Identifiers = %d \n",c);
+    return 0;
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+16./* Design a LEX Code to identify and print integer and float value in given input pattern. */
+%{
+    int n = 0;
+%}
+
+KEYWORDS    while|if|else|int|float 
+IDENTIFIER  [a-zA-Z_][a-zA-Z0-9_]*
+OPERATORS   "<="|"=="|"="|"++"|"-"|"*"|"+"|"("|")"|","
+SEPARATORS  "{"|"}"|";"
+
+%%
+
+{KEYWORDS}     { n++; printf("\tKeywords: %s\n", yytext); }
+{IDENTIFIER}   { n++; printf("\tIdentifier: %s\n", yytext); }
+{OPERATORS}    { n++; printf("\tOperator: %s\n", yytext); }
+{SEPARATORS}   { n++; printf("\tSeparator: %s\n", yytext); }
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{ 
+    printf("Enter the C fragment:\n");
+    yylex();
+    printf("\nTotal number of tokens = %d\n", n); 
+    return 0;
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+17./* Write a Lex code for replacing multiple whitespaces with single whitespace */
+
+%{
+%}
+
+%%
+
+[\n\t]+ fprintf(yyout, " ");
+. fprintf (yyout, "%s", yytext); 
+
+%%
+
+int yywrap() {} 
+
+int main () {
+extern FILE *yyin, *yyout;
+yyin= fopen("input.txt", "r"); 
+yyout= fopen("output.txt", "w"); 
+yylex(); 
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+18./* Write a LEX Code to remove the comments from any C-Program given at run-time and store into ‘out.c’ file */
+
+%{
+%}
+
+%%
+
+"//"[^\n]* ;
+"/*"([^*]|[*]+[^/])*[*]+"/" ;
+
+%%
+
+int yywrap() {return 1;} 
+
+int main () 
+{
+extern FILE *yyin, *yyout; 
+yyin = fopen("in.c", "r");
+yyout = fopen("out.c", "w"); 
+yylex();
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+19./* Design a LEX Code to extract all html tags in the given HTML file at run time and store into Text file given at run time. */
+
+%{
+    #include <stdio.h>
+    #include <stdlib.h>
+    FILE *outputFile;
+%}
+
+%%
+
+"<"[^>]+">" { fprintf(outputFile, "%s\n", yytext); }
+.|\n ; /* Ignore all other characters */
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main(int argc, char **argv)
+{
+    if (argc != 3)
+    {
+        printf("Usage: ./extract_tags <input_html_file> <output_text_file>\n");
+        return 1;
+    }
+
+    FILE *inputFile = fopen(argv[1], "r");
+    if (inputFile == NULL)
+    {
+        printf("Error: Unable to open input HTML file.\n");
+        return 1;
+    }
+
+    outputFile = fopen(argv[2], "w");
+    if (outputFile == NULL)
+    {
+        printf("Error: Unable to create output text file.\n");
+        fclose(inputFile);
+        return 1;
+    }
+
+    yyin = inputFile;
+    yylex();
+
+    fclose(inputFile);
+    fclose(outputFile);
+
+    printf("HTML tags extracted and stored in '%s' file.\n", argv[2]);
+    return 0;
+}
+
+flex extract_tags.l
+gcc lex.yy.c -o extract_tags -lfl
+./extract_tags input_html_file.html output_text_file.txt
+
+Example:
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Example HTML File</title>
+</head>
+<body>
+    <h1>Hello, World!</h1>
+    <p>This is an example HTML file.</p>
+    <div>
+        <a href="https://www.example.com">Visit Example</a>
+    </div>
+    <ul>
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+    </ul>
+</body>
+</html>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+20.**Total operators in a string:
+
+%{
+    #include<stdio.h>
+    int n = 0;
+%}
+
+%%
+
+[+ - / % *] {n++;}
+[& || !] {n++;}
+[< > == != <= >=] {n++;}
+
+%%
+int yywrap() {return 1;}
+
+int main(){
+    printf("Enter string :\n");
+    yylex();
+    printf("Total: %d\n",n);
+    return 0;
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+21./* Write a LEX code for implementation of DFA accepting even no. of a and b over input {a,b} with dead state. */
+
+%s A B C F
+
+%%
+
+<INITIAL>\n printf("Accepted\n"); BEGIN INITIAL;
+<INITIAL>a BEGIN A;
+<INITIAL>b BEGIN B;
+<A>a BEGIN INITIAL;
+<A>b BEGIN C;
+<A>\n printf("Not accepted\n"); BEGIN F;
+<B>a BEGIN C;
+<B>b BEGIN INITIAL;
+<B>\n printf("Not accepted\n"); BEGIN F;
+<C>a BEGIN B;
+<C>b BEGIN A;
+<C>\n printf("Not accepted\n"); BEGIN F;
+<A>[^ab\n] printf("Not accepted\n"); BEGIN F;
+<B>[^ab\n] printf("Not accepted\n"); BEGIN F;
+<C>[^ab\n] printf("Not accepted\n"); BEGIN F;
+<INITIAL>[^ab\n] printf("Not accepted\n"); BEGIN F;
+<F>[^\n] BEGIN F;
+<F>[\n] BEGIN INITIAL; printf("Invalid Input\n");
+
+%%
+
+int yywrap() {} 
+int main() {
+    printf("Enter a string of 'a' and 'b': "); 
+    yylex(); 
+    return 0;
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+22.
+**Calculator in lex:
+%{
+#include <stdio.h>
+#include <stdlib.h>
+float p, flag, answer;
+char cc;
+%}
+
+digit [0-9]+
+op "+"|"-"|"*"|"/"
+
+%%
+
+{digit} {
+    p = atof(yytext);
+    if (flag == 0) {
+        answer = p;
+        flag = 1;
+    } else {
+        switch (cc) {
+            case '+':
+                answer = answer + p;
+                break;
+            case '-':
+                answer = answer - p;
+                break;
+            case '*':
+                answer = answer * p;
+                break;
+            case '/':
+                if (p != 0) {
+                    answer = answer / p;
+                } else {
+                    printf("\nError: Division by zero\n");
+                    exit(1);
+                }
+                break;
+        }
+    }
+}
+
+{op} {
+    if (strcmp(yytext, "+") == 0)
+        cc = '+';
+    else if (strcmp(yytext, "-") == 0)
+        cc = '-';
+    else if (strcmp(yytext, "*") == 0)
+        cc = '*';
+    else if (strcmp(yytext, "/") == 0)
+        cc = '/';
+}
+
+! {
+    printf("\nFinal Answer = %f\n", answer);
+    exit(0);
+}
+%%
+
+int main() {
+    flag = answer = 0;
+    printf("Enter the Question String: ");
+    yylex();
+    return 0;
+}
+
+------------------------------------------------------------------------------------------------------------------------------------------------- 
+23.
+LEX program to find frequency of a word 
+CODE: 
+%{ 
+#include <stdio.h> 
+#include <string.h> 
+char word[] = "BITS"; 
+int count = 0; 
+%} 
+
+%% 
+[a-zA-Z]+ {
+    if (strcmp(yytext, word) == 0)
+        count++;
+} 
+. ; 
+%% 
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    FILE* file = fopen("BITS.txt", "r");
+    if (file == NULL) {
+        perror("Error opening the file");
+        return 1;
+    }
+    yyin = file;
+
+    yylex();
+
+    printf("The frequency of the given word is %d\n", count);
+
+    fclose(file);
+    return 0; 
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+24.Lex program for lexical Analysis:
+
+%{ 
+#include <stdio.h> 
+%} 
+
+keyword (int|float|double|main|include|printf) 
+digit [0-9]+ 
+var [a-zA-Z][a-zA-Z0-9]* 
+operator [\+\-\*\/\|\&\&\|\|\>\<\=\(\)\;] 
+
+%% 
+
+{digit}     { printf("%s is a digit\n", yytext); } 
+{keyword}   { printf("%s is a keyword\n", yytext); } 
+{var}       { printf("%s is a variable\n", yytext); } 
+{operator}  { printf("%s is an operator\n", yytext); } 
+\".*\"      { printf("%s is a string\n", yytext); } 
+\{          { printf("%s is the start of the block\n", yytext); } 
+\}          { printf("%s is the end of the block\n", yytext); } 
+\n          { printf("End of the line\n"); } 
+.           { printf("Invalid character: %c\n", yytext[0]); } 
+
+%% 
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    FILE* file = fopen("Code.txt", "r");
+    if (file == NULL) {
+        perror("Error opening the file");
+        return 1;
+    }
+    yyin = file;
+
+    yylex();
+
+    fclose(file);
+    return 0;
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+25.count data members,class count,member functions:
+
+%{
+  int classesCount = 0;
+  int dataMembersCount = 0;
+  int memberFunctionsCount = 0;
+%}
+
+DATA_TYPES (((signed|unsigned|short|long)[ ])?(int|char|double))|(float|bool|void|wchar_t)
+IDENTIFIERS [a-zA-Z_][a-zA-Z0-9_]*
+
+MEMBER_FUNCTIONS {DATA_TYPES}[ ]+{IDENTIFIERS}[ ]*\([^)]*\)
+DATA_MEMBERS {DATA_TYPES}[ ]+{IDENTIFIERS} 
+
+%%
+
+[\t ]+ {}
+
+"class" {
+  classesCount++;
+}
+
+{MEMBER_FUNCTIONS} {
+  memberFunctionsCount++;
+}
+
+{DATA_MEMBERS} {
+  dataMembersCount++;
+}
+
+[a-zA-Z]+ {}
+. {}
+
+%%
+
+int main() {
+  yylex();
+  printf("Number of classes: %d\n", classesCount);
+  printf("Number of data members: %d\n", dataMembersCount);
+  printf("Number of member functions: %d\n", memberFunctionsCount);
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+26.Loweer to Upper:
+%{
+  int LOWER = 'a';
+%}
+
+%%
+
+[\t]+ {} 
+
+[a-z] {
+  printf("%c", yytext[0] - ('a' - 'A'));
+}
+
+. { ECHO; }
+
+%%
+
+int main() {
+  yylex();
+  return 0;
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+27.start with a word:
+
+%{
+	int count = 0;
+%}
+
+alpha [a-zA-Z]
+digit [0-9]
+space [\t\n]
+start ^word
+%%
+
+{start} { count++; }
+{space}([aA]({alpha}|{digit})*) { count++; }
+. ;
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    printf("Enter the word\n");
+    yylex();
+    printf("count = %d\n", count);
+
+    return 0;
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+28.character count,word count,space count,line count,comma count,fullstop count:
+
+%{
+  #include<string.h>
+  int wordsCount = 0;
+  int lineCount = 1;
+  int charactersCount = 0;
+  int numbersCount = 0;
+  int spacesCount = 0;
+  int commaCount = 0;
+  int fullStopCount = 0;
+%}
+
+%%
+
+[0-9]+ {
+  numbersCount++;
+  charactersCount += (int)strlen(yytext);
+}
+
+[ ]+ {
+  spacesCount++;
+  charactersCount++;
+}
+                      
+, {
+  commaCount++;
+  charactersCount++;
+}
+
+\. {
+  fullStopCount++;
+  charactersCount++;
+}
+
+[a-zA-Z0-9']+ {
+  wordsCount++;
+  charactersCount += (int)strlen(yytext);
+}
+
+. {
+  charactersCount++;
+}
+
+\n { 
+  lineCount++;
+  charactersCount++;
+}
+
+%%
+
+int main() {
+  yylex();
+  printf("Number of words: %d\n", wordsCount);
+  printf("Number of lines: %d\n", lineCount);
+  printf("Number of characters: %d\n", charactersCount);
+  printf("Number of numbers: %d\n", numbersCount);
+  printf("Number of spaces: %d\n", spacesCount);
+  printf("Number of commas: %d\n", commaCount);
+  printf("Number of full stops: %d\n", fullStopCount);
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------
+29.Match Vowels:
+%{
+#include <string.h>
+int count = 0;
+%}
+
+%%
+
+[\t]+ {}
+
+[a-zA-Z0-9]*[aeiouAEIOU]+[a-zA-Z0-9]* {
+  printf("Word: %s\t Vowels: ", yytext);
+
+  int len = strlen(yytext);
+  int vowels = 0;
+  for (int i = 0; i < len; ++i) {
+    char c = yytext[i];
+    if (strchr("aeiouAEIOU", c)) {
+      ++vowels;
+      printf("%c ", c);
+    }
+  }
+  printf("(%d)\n", vowels);
+  count += vowels;
+}
+
+. {}
+
+%%
+
+int main() {
+  printf("Enter text:\n");
+  yylex();
+  printf("\nTotal count of vowels: %d\n", count);
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+30.Token Count:
+
+%{
+  int operatorsCount = 0;
+  int identifiersCount = 0;
+  int keywordsCount = 0;
+  int specialSymbolsCount = 0;
+%}
+
+KEYWORDS        (auto|break|case|char|const|continue|default|do|double|else|enum|extern|float|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch|typedef|union|unsigned|void|volatile|while)
+
+ARITHMETIC      (\+|-|\*|\/|%|\+\+|--)
+RELATIONAL      (==|!=|>=|<=|>|<)
+LOGICAL         (&&|\|\||!)
+BITWISE         (\^|\||&|<<|>>)
+ASSIGNMENT      (=|\+=|-=|\*=|\/=|%=)
+
+OPERATORS       ({ARITHMETIC}|{RELATIONAL}|{LOGICAL}|{BITWISE}|{ASSIGNMENT})
+
+SPECIAL_SYMBOLS [;{}\(\)\[\]@#$,"`~!&?\\\.\*]
+
+%%
+
+[\s]+                   /* ignore whitespaces */
+
+{OPERATORS} {
+  operatorsCount++;
+}
+
+{KEYWORDS} {
+  keywordsCount++;
+}
+
+[a-zA-Z_][a-zA-Z0-9_]* {
+  identifiersCount++;
+}
+
+{SPECIAL_SYMBOLS} { 
+  specialSymbolsCount++;
+}
+
+. {}                        
+
+%%
+
+int main() {
+  yylex();
+  printf("\n\nNumber of Operators: %d\n", operatorsCount);
+  printf("Number of Identifiers: %d\n", identifiersCount);
+  printf("Number of Keywords: %d\n", keywordsCount);
+  printf("Number of Special Symbols: %d\n", specialSymbolsCount);
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+31.Mixed Case:
+
+%{
+  int count = 0;
+%}
+
+%%
+
+[\s]+ {}
+
+[a-zA-Z0-9]*([a-z][a-zA-Z0-9]*[A-Z]|[A-Z][a-zA-Z0-9]*[a-z])[a-zA-Z0-9] {
+  count++;
+  printf("%s\n", yytext);
+}
+
+. {}
+
+%%
+
+int main() {
+  yylex();
+  printf("\n\nNumber of words with mixed case: %d\n", count);
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+32.Check validity of a URL:
+%%
+((http|ftp)s?:\/\/[a-zA-Z0-9]+\.[a-z]{2,})+(\/[a-zA-Z0-9+=?]*)* {printf("\nURL Valid\n");}
+.+ {printf("\nURL Invalid\n");}
+%%
+
+// driver program
+int main()
+{
+	printf("\nEnter URL : ");
+	yylex();
+	printf("\n");
+	return 0;
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+33.Validity of email:
+
+/*lex code to accept a valid email */
+%
+{
+int flag = 0; %
+} %
+% [a - z.0 - 9 _] + @[a - z] + ".com" | ".in"
+flag = 1; %
+%
+main() {
+yylex();
+if (flag == 1)
+	printf("Accepted");
+else
+	printf("Not Accepted");
+}
+
+
+
+/*Credits: Soumyojyoti Saha 21BCE4007 */
